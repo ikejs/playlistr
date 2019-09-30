@@ -4,7 +4,11 @@
 {% block content %}
     <h1>Playlists</h1>
     {% for playlist in playlists %}
+    <hr>
         <h2>{{ playlist.title }}</h2>
         <small>{{ playlist.description }}</small>
+        {% for video in playlist.videos %}
+            <br><a href="{{video.url}}" target="_blank">{{video.name}}</a>
+        {% endfor %}
     {% endfor %}
 {% endblock %}
