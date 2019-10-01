@@ -2,17 +2,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Playlists</h1>
-    <a href="/playlists/new">New Playlist</a>
-    {% for playlist in playlists %}
-    <hr>
-        <h2>{{ playlist.title }}</h2>
-        <small>{{ playlist.description }}</small>
-    <!--
-        STRETCH CHALLENGE TEST
-        {% for video in playlist.videos %}
-            <br><a href="{{video.url}}" target="_blank">{{video.name}}</a>
-        {% endfor %}
-    -->
-    {% endfor %}
+<h1>Playlists</h1>
+
+<a href='/playlists/new'>New Playlist</a>
+
+{% for playlist in playlists %}
+    <h2><a href='/playlists/{{ playlist._id }}'>{{ playlist.title }}</a></h2>
+    <small>{{ playlist.description }}</small>
+{% endfor %}
 {% endblock %}
