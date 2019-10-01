@@ -59,8 +59,10 @@ def playlists_submit():
     playlist = {
         'title': request.form.get('title'),
         'description': request.form.get('description'),
-        'videos': request.form.get('videos').split()
+        'videos': request.form.get('videos').split(),
+        'rating': request.form.get('rating')
     }
+    print(playlist)
     playlists.insert_one(playlist)
     return redirect(url_for('playlists_index'))
 
