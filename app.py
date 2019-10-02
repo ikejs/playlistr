@@ -1,11 +1,14 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+import urllib.parse as urlparse
 
 app = Flask(__name__)
 
-client = MongoClient()
-db = client.Playlister
+host = os.environ.get('MONGODB_URI', 'mongodb://localhost:27017/Playlister')
+client = MongoClient(host=host)
+db = client.get_default_database()
 playlists = db.playlists
 
 
@@ -57,10 +60,18 @@ def playlists_new():
 @app.route('/playlists', methods=['POST'])
 def playlists_submit():
     """Submit a new playlist."""
+    videoURLs = request.form.get('videos').split() # List of inputted YouTube URLs
+    videos = [] # Collection of YouTube video IDs
+    for url in videoURLs: # https://stackoverflow.com/questions/4356538/how-can-i-extract-video-id-from-youtubes-link-in-python
+        url_data = urlparse.urlparse(url)
+        query = urlparse.parse_qs(url_data.query)
+        video = query["v"][0]
+        videos.append(video)
+
     playlist = {
         'title': request.form.get('title'),
         'description': request.form.get('description'),
-        'videos': request.form.get('videos').split(),
+        'videos': videos,
         'rating': request.form.get('rating')
     }
     playlist_id = playlists.insert_one(playlist).inserted_id
@@ -88,10 +99,18 @@ def playlists_edit(playlist_id):
 @app.route('/playlists/<playlist_id>', methods=['POST'])
 def playlists_update(playlist_id):
     """Submit an edited playlist."""
+    videoURLs = request.form.get('videos').split() # List of inputted YouTube URLs
+    videos = [] # Collection of YouTube video IDs
+    for url in videoURLs: # https://stackoverflow.com/questions/4356538/how-can-i-extract-video-id-from-youtubes-link-in-python
+        url_data = urlparse.urlparse(url)
+        query = urlparse.parse_qs(url_data.query)
+        video = query["v"][0]
+        videos.append(video)
+
     updated_playlist = {
         'title': request.form.get('title'),
         'description': request.form.get('description'),
-        'videos': request.form.get('videos').split(),
+        'videos': videos,
         'rating': request.form.get('rating')
     }
     playlists.update_one(
@@ -109,4 +128,4 @@ def playlists_delete(playlist_id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+  app.run(debug=True, host='0.0.0.0', port=os.environ.get('PORT', 80))
